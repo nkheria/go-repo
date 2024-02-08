@@ -6,32 +6,37 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"example.com/go-demo-1/pkg/config"
 )
 
+var app *config.AppConfig
+var functions = template.FuncMap{}
+
+func NewTemplates(a *config.AppConfig) {
+	app = a
+
+}
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
-	//Create a template cache
-	tc, err := createTemplateCache()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//get the cache from the app config
+	tc := app.TemplateCache
+
 	//Requested template from cache
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get the template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
 
-	err = t.Execute(buf, nil)
-	if err != nil {
-		log.Println(err)
-	}
+	_ = t.Execute(buf, nil)
+
 	//render the template
 
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error writing the template to browser", err)
 	}
 }
 
