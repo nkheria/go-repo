@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"example.com/go-demo-1/pkg/config"
+	"example.com/go-demo-1/pkg/models"
 )
 
 var app *config.AppConfig
@@ -15,10 +16,9 @@ var functions = template.FuncMap{}
 
 func NewTemplates(a *config.AppConfig) {
 	app = a
-
 }
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	//get the cache from the app config
 	tc := app.TemplateCache
 
@@ -33,14 +33,13 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	_ = t.Execute(buf, nil)
 
 	//render the template
-
 	_, err := buf.WriteTo(w)
 	if err != nil {
 		log.Println("Error writing the template to browser", err)
 	}
 }
 
-func createTemplateCache() (map[string]*template.Template, error) {
+func CreateTemplateCache() (map[string]*template.Template, error) {
 	// myCache := make(map[string]*template.Template)
 
 	myCache := map[string]*template.Template{}
@@ -74,5 +73,4 @@ func createTemplateCache() (map[string]*template.Template, error) {
 	}
 
 	return myCache, nil
-
 }
