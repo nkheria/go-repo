@@ -1,5 +1,21 @@
 {{template "base" .}}
 
 {{define "content"}}
+`
+
+    attention.custom ({
+
+    msg: html,
+    title: "Choose your dates!",
+    callback: function() {
+        console.log("callback");
+
+        fetch('search-availability-json')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            console.log(data.ok)
+            console.log(data.message);
+        },`
     
 {{end}}
