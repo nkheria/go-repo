@@ -4,6 +4,7 @@ import (
 	"bookings-app/pkg/config"
 	"bookings-app/pkg/models"
 	"bookings-app/pkg/render"
+	"fmt"
 	"net/http"
 )
 
@@ -67,7 +68,10 @@ func (m *Repository) Availaibity(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) PostAvailaibity(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Posted to search functionality"))
+
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+	w.Write([]byte(fmt.Sprintf("Start Dat is %s and end date is %s", start, end)))
 }
 
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
