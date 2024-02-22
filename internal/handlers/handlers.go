@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/tsawler/bookings-app/internal/config"
 	"github.com/tsawler/bookings-app/internal/driver"
 	"github.com/tsawler/bookings-app/internal/forms"
@@ -11,7 +13,6 @@ import (
 	"github.com/tsawler/bookings-app/internal/render"
 	"github.com/tsawler/bookings-app/internal/repository"
 	"github.com/tsawler/bookings-app/internal/repository/dbrepo"
-	"net/http"
 )
 
 // Repo the repository used by the handlers
@@ -160,5 +161,11 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 
 	render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
+	})
+}
+
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, "login.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
 	})
 }
