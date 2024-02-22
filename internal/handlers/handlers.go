@@ -2,15 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
-
 	"github.com/tsawler/bookings-app/internal/config"
+	"github.com/tsawler/bookings-app/internal/driver"
 	"github.com/tsawler/bookings-app/internal/forms"
 	"github.com/tsawler/bookings-app/internal/helpers"
 	"github.com/tsawler/bookings-app/internal/models"
 	"github.com/tsawler/bookings-app/internal/render"
+	"github.com/tsawler/bookings-app/internal/repository"
+	"github.com/tsawler/bookings-app/internal/repository/dbrepo"
+	"net/http"
 )
 
 // Repo the repository used by the handlers
@@ -19,12 +20,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -40,8 +43,6 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
 // About is the handler for the about page
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-
-	// send data to the template
 	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
@@ -60,7 +61,6 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 // PostReservation handles the posting of a reservation form
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
-	err = errors.New("this is an error message")
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -76,7 +76,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 
 	form.Required("first_name", "last_name", "email")
-	form.MinLength("first_name", 3, r)
+	form.MinLength("first_name", 3)
 	form.IsEmail("email")
 
 	if !form.Valid() {
@@ -131,6 +131,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	out, err := json.MarshalIndent(resp, "", "     ")
 	if err != nil {
 		helpers.ServerError(w, err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -146,7 +147,6 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		// log.Println("can't get item from session")
 		m.App.ErrorLog.Println("Can't get reservation from session")
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)

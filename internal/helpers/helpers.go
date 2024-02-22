@@ -2,15 +2,14 @@ package helpers
 
 import (
 	"fmt"
+	"github.com/tsawler/bookings-app/internal/config"
 	"net/http"
 	"runtime/debug"
-
-	"github.com/tsawler/bookings-app/internal/config"
 )
 
 var app *config.AppConfig
 
-// NewHelpers sets the config for the helpers package
+// NewHelpers sets up app config for helpers
 func NewHelpers(a *config.AppConfig) {
 	app = a
 }
