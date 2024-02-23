@@ -1,11 +1,12 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/tsawler/bookings/internal/config"
 	"github.com/tsawler/bookings/internal/handlers"
-	"net/http"
 )
 
 func routes(app *config.AppConfig) http.Handler {
@@ -32,6 +33,8 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Post("/make-reservation", handlers.Repo.PostReservation)
 	mux.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
+	mux.Get("user/login", handlers.Repo.ShowLogin)
+	mux.Post("user/login", handlers.Repo.PostShowLogin)
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
